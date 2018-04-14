@@ -1,5 +1,6 @@
 package EnhancedMediaPlayer;
 
+import java.io.File;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 /**
@@ -95,6 +97,9 @@ public class EnhancedMediaPlayer extends Application
         lv_playlist = new ListView();
         vb_playlistContain.setPadding(new Insets(40, 50, 0, 20));
         btn_addSong = new Button("+");
+        btn_addSong.setOnMouseClicked(e -> {
+           chooseFile(); 
+        });
         vb_playlistContain.getChildren().addAll(lv_playlist, btn_addSong);
         bPane.setRight(vb_playlistContain);
         
@@ -115,11 +120,16 @@ public class EnhancedMediaPlayer extends Application
         
         bPane.setCenter(hb_imgHolder);
         
+    }
+    
+    public void chooseFile()
+    {
+        FileChooser f = new FileChooser();
         
-        
-       
-        
-        
-        
+        File src = f.showOpenDialog(null);
+                if (src != null)
+                    lv_playlist.getItems().add(src.getName());
+                else
+                    System.out.println("No File Selected.");
     }
 }
