@@ -2,6 +2,8 @@ package EnhancedMediaPlayer;
 
 import java.io.File;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,8 +15,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
 
 /**
  *
@@ -26,9 +32,13 @@ public class EnhancedMediaPlayer extends Application
     BorderPane bPane = new BorderPane();
     HBox hb_btnHolder, hb_sldHolder, hb_bottomParent;
     VBox vb_playlistContain;
-    ListView lv_playlist;
+    ObservableList<File> files;
+    ListView<String> lv_playlist;
     Button btn_prevSong, btn_play_pause, btn_nextSong, btn_scrubBack, btn_scrubForward, btn_addSong;
     Slider sld_volume, sld_scrubber;
+    MediaPlayer mp;
+    Media m;
+    
     
     public static void main(String[] args)
     {
@@ -40,6 +50,7 @@ public class EnhancedMediaPlayer extends Application
     {
         scene = new Scene(bPane, 800,600);
         setUpMediaPane();
+        allActions();
         primaryStage.setTitle("Enhanced Media Player");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -64,17 +75,10 @@ public class EnhancedMediaPlayer extends Application
         
         bPane.setBottom(hb_bottomParent);
         
-        
-        
         btn_prevSong = new Button("<<<");
         btn_scrubBack = new Button("<<");
         btn_play_pause = new Button(">");
-        btn_play_pause.setOnMouseClicked(e -> {
-            if(btn_play_pause.getText().equals(">"))
-                btn_play_pause.setText("||");
-            else 
-                btn_play_pause.setText(">");
-        });
+        
         
         btn_scrubForward = new Button(">>");
         btn_nextSong = new Button(">>>");
@@ -94,12 +98,12 @@ public class EnhancedMediaPlayer extends Application
         hb_sldHolder.getChildren().addAll(sld_scrubber, sld_volume);
         
         vb_playlistContain = new VBox(10);
-        lv_playlist = new ListView();
+        
+        files = FXCollections.observableArrayList();
+        lv_playlist = new ListView<>();
         vb_playlistContain.setPadding(new Insets(40, 50, 0, 20));
         btn_addSong = new Button("+");
-        btn_addSong.setOnMouseClicked(e -> {
-           chooseFile(); 
-        });
+        
         vb_playlistContain.getChildren().addAll(lv_playlist, btn_addSong);
         bPane.setRight(vb_playlistContain);
         
@@ -120,16 +124,64 @@ public class EnhancedMediaPlayer extends Application
         
         bPane.setCenter(hb_imgHolder);
         
+         
+        
+        
     }
     
     public void chooseFile()
     {
         FileChooser f = new FileChooser();
-        
+        f.getExtensionFilters().add(new ExtensionFilter("Mp3 Files", "*.mp3"));
         File src = f.showOpenDialog(null);
                 if (src != null)
+                {
+                    
                     lv_playlist.getItems().add(src.getName());
+                    if(files.isEmpty())
+                    {
+                        files.add(src);
+                        createMedia();
+                    }
+                    else
+                        files.add(src);
+                    
+                    
+                }
                 else
                     System.out.println("No File Selected.");
+    }
+    
+    public void allActions()
+    {
+        //lambda to add mp3 to listview
+        btn_addSong.setOnMouseClicked(e -> {
+           chooseFile(); 
+        });
+        
+        /*lambda to control pause and play
+        needs functionality once media player is created.
+        */
+        btn_play_pause.setOnMouseClicked(e -> {
+            if(btn_play_pause.getText().equals(">"))
+            {
+                btn_play_pause.setText("||");
+                mp.play();
+            }
+            else 
+            {
+                btn_play_pause.setText(">");
+                mp.pause();
+            }
+            
+        });
+        
+    }
+    
+    public void createMedia()
+    {
+        m = new Media(files.get(0).toURI().toString());
+        mp = new MediaPlayer(m);
+        mp.play();
     }
 }
