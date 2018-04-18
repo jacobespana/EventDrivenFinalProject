@@ -297,13 +297,12 @@ public class EnhancedMediaPlayer extends Application
         });
         
         btn_scrubBack.setOnAction(e->{
-           if (mp.getCurrentTime()==Duration.ZERO) //NOT IMPLEMENTED YET
+           if(mp.getCurrentTime().lessThanOrEqualTo(new Duration(5000))) 
             {
-
+               mp.pause(); //replace this with createMedia(prevIndex);
+            } else {
+               mp.seek(mp.getCurrentTime().subtract(new Duration(5000)));
             }
-          
-              mp.seek((Duration.ZERO));
-        
         });
         
         
